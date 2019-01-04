@@ -39,7 +39,7 @@ public class PropertiesUtil {
     private void loadProperties() {
         for (String r : resources) {
             try {
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream(r);
+                InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(r);
                 if (is == null)
                     continue;
                 properties = new Properties();

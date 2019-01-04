@@ -1,5 +1,7 @@
 package sunnn.sunframework.bean;
 
+import sunnn.sunframework.resource.BeanDefinition;
+
 public interface BeanContainer {
 
     Object getBean(String beanName);

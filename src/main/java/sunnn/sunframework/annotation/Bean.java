@@ -11,5 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Bean {
 
-    BeanType type() default BeanType.SINGLETON;
+    String name();
+
+    BeanType scope() default BeanType.SINGLETON;
 }
