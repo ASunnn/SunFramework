@@ -2,6 +2,8 @@ package sunnn.sunframework.resource;
 
 import sunnn.sunframework.bean.BeanType;
 
+import java.lang.reflect.Method;
+
 public class BeanDefinition extends Resource {
 
 //    public static final String TYPE_DEPENDS = "_type";
@@ -9,6 +11,10 @@ public class BeanDefinition extends Resource {
     private String beanName;
 
     private Class clazz;
+
+    private Method method;
+
+    private boolean useBeans;
 
     private String[] depends;
 
@@ -23,6 +29,16 @@ public class BeanDefinition extends Resource {
 
     public BeanDefinition setClazz(Class clazz) {
         this.clazz = clazz;
+        return this;
+    }
+
+    public BeanDefinition setMethod(Method method) {
+        this.method = method;
+        return this;
+    }
+
+    public BeanDefinition setUseBeans(boolean useBeans) {
+        this.useBeans = useBeans;
         return this;
     }
 
@@ -42,6 +58,14 @@ public class BeanDefinition extends Resource {
 
     public Class getClazz() {
         return clazz;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public boolean isUseBeans() {
+        return useBeans;
     }
 
     public String[] getDepends() {

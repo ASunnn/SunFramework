@@ -1,6 +1,7 @@
 package sunnn.sunframework.bean;
 
 import sunnn.sunframework.annotation.Depend;
+import sunnn.sunframework.annotation.Depends;
 import sunnn.sunframework.exception.CanNotFindBeanException;
 import sunnn.sunframework.exception.CircularDependsException;
 import sunnn.sunframework.exception.DuplicateBeanNameException;
@@ -127,15 +128,13 @@ public class DefaultBeanContainer implements ConfigurableBeanContainer {
     }
 
     private Object getObjectFromBean(Object bean, boolean getFactoryBean) throws Exception {
-        if (getFactoryBean) {
+        if (getFactoryBean)
             return bean;
-        }
 
         if (bean instanceof FactoryBean) {
             return ((FactoryBean) bean).getObject();
-        } else {
+        } else
             return bean;
-        }
     }
 
     private Object createSingletonBeanInstance(BeanDefinition beanDefinition) throws Exception {
@@ -192,31 +191,52 @@ public class DefaultBeanContainer implements ConfigurableBeanContainer {
 
 
     private Object doCreateInstance(BeanDefinition definition) throws Exception {
-        // 检查可见性
-        Class clazz = definition.getClazz();
-        if (Modifier.isPublic(clazz.getModifiers())) {
-            throw new IllegalAccessException("Can Not Access Bean : " + definition.getBeanName());
-        }
-
         Object bean = null;
-        // 获取合适的构造方法
-        Constructor[] constructors = clazz.getDeclaredConstructors();
 
-        for (Constructor c : constructors) {
-            if (c.getParameterTypes().length == 0) {
-                bean = c.newInstance();
+        if (definition.isUseBeans()) {
+            // 检查可见性
+            Method method = definition.getMethod();
+            if (!Modifier.isPublic(method.getModifiers())) {
+                throw new IllegalAccessException("Can Not Access Bean Method : " + definition.getBeanName());
+            }
+
+            // 获取依赖的传入参数
+            Depends dependsAnnotation = method.getAnnotation(Depends.class);
+            String[] depends = dependsAnnotation == null ?
+                    new String[0]
+                    : dependsAnnotation.name();
+            // 获取参数实例
+            Object[] dependObjects = new Object[depends.length];
+            for (int i = 0; i < depends.length; ++i) {
+                dependObjects[i] = getBean(depends[i]);
+            }
+
+            bean = method.invoke(getBean(definition.getDepends()[0]), dependObjects);
+        } else {
+            // 检查可见性
+            Class clazz = definition.getClazz();
+            if (!Modifier.isPublic(clazz.getModifiers())) {
+                throw new IllegalAccessException("Can Not Access Bean Constructor : " + definition.getBeanName());
+            }
+            // 获取合适的构造方法
+            Constructor[] constructors = clazz.getDeclaredConstructors();
+
+            for (Constructor c : constructors) {
+                if (c.getParameterTypes().length == 0) {
+                    bean = c.newInstance();
+                }
             }
         }
-
         return bean;
     }
 
     private void autowireBean(Object bean, BeanDefinition beanDefinition) throws Exception {
-        String[] depends = beanDefinition.getDepends();
         Class clazz = beanDefinition.getClazz();
+        Field[] fields = getAutowireFields(clazz);
 
-        for (String depend : depends) {
-            Field field = getAutowireField(depend, clazz);
+        for (Field field : fields) {
+            String depend =
+                    field.getAnnotation(Depend.class).name();
 
             Method method = getAutowireMethod(depend, field, clazz);
             if (method == null) {
@@ -227,18 +247,20 @@ public class DefaultBeanContainer implements ConfigurableBeanContainer {
         }
     }
 
-    private Field getAutowireField(String beanName, Class clazz) {
+    private Field[] getAutowireFields(Class clazz) {
         Field[] fields = clazz.getDeclaredFields();
-        Field target = null;
 
+        List<Field> targets = new ArrayList<>();
         for (Field f : fields) {
             Depend depend = f.getAnnotation(Depend.class);
             if (depend != null) {
-                if (beanName.equals(depend.name()))
-                    target = f;
+                targets.add(f);
             }
         }
-        return target;
+
+        Field[] t = new Field[targets.size()];
+        targets.toArray(t);
+        return t;
     }
 
     private Method getAutowireMethod(String beanName, Field field, Class clazz) {
