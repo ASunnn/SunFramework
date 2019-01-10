@@ -44,7 +44,7 @@ public class DefaultClassResourceLoader implements ClassResourceLoader {
 
         for (File f : files) {
             if (f.isDirectory())
-                classFile.addAll(loadClassFile(path));
+                classFile.addAll(loadClassFile(f));
             else
                 classFile.add(f);
         }
@@ -52,10 +52,10 @@ public class DefaultClassResourceLoader implements ClassResourceLoader {
     }
 
     private ClassResource loadClass(File file, String pkg) throws ClassNotFoundException {
-        String className = file.getName()
-                .substring(0, file.getName().lastIndexOf('.'));
+        String className = file.getPath().replace(File.separatorChar, '.')
+                .substring(0, file.getPath().lastIndexOf('.'));
 
-        String fullClassName = pkg + className;
+        String fullClassName = className.substring(className.indexOf(pkg));
         Class clazz = ClassLoader.getSystemClassLoader().loadClass(fullClassName);
         return new ClassResource(className, clazz);
     }

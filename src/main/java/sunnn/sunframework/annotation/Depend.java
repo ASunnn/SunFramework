@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 public @interface Depend {
 
     String name();
+
+//    InjectType injectType() default InjectType.SETTER;
 }

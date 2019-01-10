@@ -2,7 +2,6 @@ package sunnn.sunframework.resource;
 
 import sunnn.sunframework.annotation.Bean;
 import sunnn.sunframework.annotation.Depend;
-import sunnn.sunframework.annotation.InjectByType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class DefaultBeanResourceLoader implements BeanResourceLoader {
     }
 
     private String[] getBeanDepends(Class clazz) {
-        Field[] fields = clazz.getFields();
+        Field[] fields = clazz.getDeclaredFields();
 
         List<String> depends = new ArrayList<>();
         for (Field f : fields) {

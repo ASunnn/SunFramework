@@ -1,5 +1,8 @@
 package sunnn.sunframework.util;
 
+import sunnn.sunframework.exception.IllegalConfigException;
+import sunnn.sunframework.exception.LoadResourceException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -45,8 +48,7 @@ public class PropertiesUtil {
                 properties = new Properties();
                 properties.load(is);
             } catch (IOException e) {
-                // TODO 无法载入资源
-                e.printStackTrace();
+                throw new LoadResourceException("Can Not Load Resource : " + r);
             }
         }
 
@@ -55,8 +57,9 @@ public class PropertiesUtil {
 
     private void checkProperties() {
         if (properties == null) {
-            // TODO 前一步失败
+            throw new LoadResourceException("Can Not Load Resource");
         }
+
         HashSet<String> checked = new HashSet<>(4);
         /*
             检查读取到的配置信息，主要是进行查重
@@ -66,7 +69,7 @@ public class PropertiesUtil {
             String key = (String) entry.getKey();
 //            String value = (String) entry.getValue();
             if (checked.contains(key)) {
-                // TODO 发现重复
+                throw new IllegalConfigException("Duplicate Config Item '" + key + "'");
             }
             checked.add(key);
         }
@@ -76,7 +79,7 @@ public class PropertiesUtil {
             如果遗漏的配置可以用默认值代替，向properties中补上该配置
          */
         if (!checked.contains(PropertiesItem.BASE_PACKAGE.value)) {
-            // TODO 没有指定基础包
+            throw new IllegalConfigException("Can Not Find Config Item '" + PropertiesItem.BASE_PACKAGE.value + "'");
         }
     }
 

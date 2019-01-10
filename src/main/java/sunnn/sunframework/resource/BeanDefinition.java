@@ -12,6 +12,8 @@ public class BeanDefinition extends Resource {
 
     private String[] depends;
 
+//    private Map<String, InjectType> inject;
+
     private BeanType scope;
 
     public BeanDefinition setBeanName(String beanName) {
