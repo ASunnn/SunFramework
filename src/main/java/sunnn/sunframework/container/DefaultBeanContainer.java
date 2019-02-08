@@ -1,7 +1,11 @@
-package sunnn.sunframework.bean;
+package sunnn.sunframework.container;
 
 import sunnn.sunframework.annotation.Depend;
 import sunnn.sunframework.annotation.Depends;
+import sunnn.sunframework.bean.BeanEvent;
+import sunnn.sunframework.bean.BeanProcessor;
+import sunnn.sunframework.bean.BeanType;
+import sunnn.sunframework.bean.FactoryBean;
 import sunnn.sunframework.exception.CanNotFindBeanException;
 import sunnn.sunframework.exception.CircularDependsException;
 import sunnn.sunframework.exception.DuplicateBeanNameException;
@@ -12,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +60,7 @@ public class DefaultBeanContainer implements ConfigurableBeanContainer {
     }
 
     @Override
-    public void registerBean(String beanName, BeanDefinition beanDefinition) throws DuplicateBeanNameException {
+    public void registerBean(String beanName, BeanDefinition beanDefinition) {
         if (isIllegalBeanName(beanName))
             throw new IllegalArgumentException("Illegal Bean Name '" + beanName + "'");
         // 先检查Map里有没有这个bean，有的话就报错——重复bean
@@ -257,6 +262,10 @@ public class DefaultBeanContainer implements ConfigurableBeanContainer {
                 targets.add(f);
             }
         }
+
+        Class c = clazz.getSuperclass();
+        if (c != null)
+            Collections.addAll(targets, getAutowireFields(c));
 
         Field[] t = new Field[targets.size()];
         targets.toArray(t);

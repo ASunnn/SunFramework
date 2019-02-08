@@ -1,6 +1,6 @@
 package sunnn.sunframework.aware;
 
-import sunnn.sunframework.bean.BeanContainer;
+import sunnn.sunframework.container.BeanContainer;
 
 public interface BeanContainerAware {
 

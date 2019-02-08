@@ -21,7 +21,7 @@ public class DefaultBeanResourceLoader implements BeanResourceLoader {
     }
 
     @Override
-    public BeanDefinition[] loadResources(String path) throws Exception {
+    public BeanDefinition[] loadResources(String path) throws ClassNotFoundException {
         ClassResource[] resources = classResourceLoader.loadResources(path);
 
         List<BeanDefinition> definitions = new ArrayList<>();
@@ -125,6 +125,10 @@ public class DefaultBeanResourceLoader implements BeanResourceLoader {
             if (depend != null)
                 depends.add(depend.name());
         }
+
+        Class c = clazz.getSuperclass();
+        if (c != null)
+            Collections.addAll(depends, getBeanDepends(c));
 
         String[] d = new String[depends.size()];
         depends.toArray(d);

@@ -1,6 +1,5 @@
-package sunnn.sunframework.bean;
+package sunnn.sunframework.container;
 
-import sunnn.sunframework.exception.BeanException;
 import sunnn.sunframework.resource.BeanDefinition;
 
 public interface BeanContainer {
@@ -13,7 +12,7 @@ public interface BeanContainer {
 
     Class getBeanType(String beanName);
 
-    void registerBean(String beanName, BeanDefinition beanDefinition) throws BeanException;
+    void registerBean(String beanName, BeanDefinition beanDefinition);
 
     int count();
 

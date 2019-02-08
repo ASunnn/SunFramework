@@ -1,4 +1,6 @@
-package sunnn.sunframework.bean;
+package sunnn.sunframework.container;
+
+import sunnn.sunframework.bean.BeanProcessor;
 
 public interface ConfigurableBeanContainer extends BeanContainer {
 
